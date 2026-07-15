@@ -1,13 +1,13 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <title>AutoCAD Web — Untitled1.dwg</title>
-
+ 
 <!-- Three.js Libraries for 3D Rendering (INJECTED) -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
-
+ 
 <style>
   :root{
     --bg-app:#33373b;
@@ -37,7 +37,7 @@
     font-size:13px;user-select:none;
   }
   button{font-family:inherit;}
-
+ 
   /* Title bar */
   .titlebar{
     height:30px;flex:0 0 auto;background:var(--bg-titlebar);
@@ -45,7 +45,7 @@
     font-size:12px;color:var(--text-dim);letter-spacing:.3px;
     border-bottom:1px solid var(--border);
   }
-
+ 
   /* Menu bar */
   .menubar{
     height:26px;flex:0 0 auto;background:var(--bg-menubar);
@@ -56,11 +56,25 @@
     padding:3px 10px;border-radius:2px;color:var(--text);cursor:default;font-size:12.5px;
   }
   .menubar .menu-item:hover{background:var(--btn-hover);}
-
+ 
+  /* File menu dropdown */
+  .file-menu{position:relative;}
+  .file-dropdown{
+    position:absolute;top:100%;left:0;background:var(--bg-panel);border:1px solid var(--border);
+    border-radius:3px;min-width:170px;box-shadow:0 6px 16px rgba(0,0,0,.4);z-index:2000;
+    display:none;padding:4px;
+  }
+  .file-dropdown.open{display:block;}
+  .file-dropdown-item{
+    padding:6px 10px;font-size:12.5px;color:var(--text);cursor:pointer;border-radius:2px;
+    display:flex;align-items:center;gap:8px;
+  }
+  .file-dropdown-item:hover{background:var(--btn-hover);}
+ 
   /* Quick access toolbar + ribbon tabs row */
   .qat-row{
     display:flex;align-items:center;background:var(--bg-ribbon);
-    border-bottom:1px solid var(--border);height:30px;flex:0 0 auto;padding:0 6px;gap:4px;
+    border-bottom:1px solid var(--border);height:24px;flex:0 0 auto;padding:0 6px;gap:4px;
   }
   .qat-btn{
     width:24px;height:24px;display:flex;align-items:center;justify-content:center;
@@ -70,7 +84,7 @@
   .qat-btn:active{background:var(--btn-active);}
   .qat-sep{width:1px;height:18px;background:var(--border);margin:0 4px;}
   .qat-title{margin-left:8px;font-size:12px;color:var(--text-dim);}
-
+ 
   .ribbon-tabs{
     display:flex;background:var(--bg-ribbon);flex:0 0 auto;padding:0 4px;
     border-bottom:1px solid var(--border);
@@ -80,11 +94,11 @@
   }
   .ribbon-tab:hover{color:var(--text);}
   .ribbon-tab.active{color:var(--text);border-bottom-color:var(--accent);}
-
+ 
   /* Ribbon panel content */
   .ribbon{
     flex:0 0 auto;background:var(--bg-ribbon);display:flex;align-items:stretch;
-    border-bottom:1px solid var(--border);min-height:88px;overflow-x:auto;
+    border-bottom:1px solid var(--border);min-height:62px;overflow-x:auto;
   }
   .ribbon-group{
     display:flex;flex-direction:column;align-items:center;padding:4px 10px;
@@ -93,10 +107,10 @@
   .ribbon-group-buttons{display:flex;gap:2px;flex:1;align-items:center;}
   .ribbon-btn{
     display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
-    width:52px;height:56px;background:transparent;border:1px solid transparent;border-radius:3px;
-    color:var(--text);cursor:pointer;padding:4px 2px;
+    width:44px;height:40px;background:transparent;border:1px solid transparent;border-radius:3px;
+    color:var(--text);cursor:pointer;padding:3px 2px;
   }
-  .ribbon-btn svg{width:22px;height:22px;stroke:currentColor;}
+  .ribbon-btn svg{width:17px;height:17px;stroke:currentColor;}
   .ribbon-btn span{font-size:10px;line-height:1.1;text-align:center;color:var(--text-dim);}
   .ribbon-btn:hover{background:var(--btn-hover);border-color:var(--border-light);}
   .ribbon-btn.active{background:var(--btn-active);border-color:var(--accent);}
@@ -112,17 +126,17 @@
   .ribbon-placeholder{
     display:flex;align-items:center;justify-content:center;width:100%;color:var(--text-dim);font-size:12px;
   }
-
+ 
   #layer-select{
     background:var(--bg-input);color:var(--text);border:1px solid var(--border);border-radius:2px;
     font-size:11px;padding:3px 4px;width:110px;
   }
-
+ 
   /* Main area */
   .main-area{flex:1 1 auto;display:flex;min-height:0; position:relative;}
   .canvas-wrap{flex:1 1 auto;position:relative;min-width:0;display:flex;flex-direction:column;}
   #cad-canvas{flex:1 1 auto;display:block;width:100%;height:100%;cursor:crosshair;background:var(--bg-canvas);}
-
+ 
   /* 🔥 INJECTED: 3D TOGGLE BUTTON 🔥 */
   #btn-3d-toggle {
     position: absolute;
@@ -141,7 +155,7 @@
     transition: all 0.2s ease;
   }
   #btn-3d-toggle:hover { background: #3d8ce3; }
-
+ 
   /* 🔥 INJECTED: 3D Canvas Container 🔥 */
   #canvas-3d-wrap {
     display: none; 
@@ -150,7 +164,7 @@
     min-width: 0; 
     background: #f8fafc;
   }
-
+ 
   .coords-readout{
     position:absolute;left:8px;bottom:8px;background:rgba(38,41,44,.85);border:1px solid var(--border);
     padding:3px 8px;border-radius:3px;font-family:Consolas,"Courier New",monospace;font-size:11.5px;color:var(--text);
@@ -165,7 +179,7 @@
     padding:2px 7px;font-family:Consolas,"Courier New",monospace;font-size:12.5px;color:var(--text);
     pointer-events:none;white-space:nowrap;z-index:5;
   }
-
+ 
   /* Side panel */
   .side-panel{
     width:250px;flex:0 0 auto;background:var(--bg-panel);border-left:1px solid var(--border);
@@ -178,7 +192,7 @@
   }
   .side-tab.active{color:var(--text);border-bottom-color:var(--accent);background:var(--bg-panel-2);}
   .side-content{flex:1;overflow-y:auto;padding:6px;}
-
+ 
   .layer-row{
     display:flex;align-items:center;gap:6px;padding:5px 6px;border-radius:3px;cursor:pointer;
     border:1px solid transparent;margin-bottom:2px;
@@ -192,18 +206,18 @@
   .layer-eye svg{width:16px;height:16px;stroke:currentColor;}
   .side-section-title{font-size:10.5px;text-transform:uppercase;letter-spacing:.5px;color:var(--text-dim);
     padding:6px 4px 4px;}
-
+ 
   .prop-row{display:flex;flex-direction:column;gap:2px;padding:6px 4px;border-bottom:1px solid var(--border);}
   .prop-row label{font-size:10.5px;color:var(--text-dim);}
   .prop-row .val{font-size:12px;font-family:Consolas,monospace;color:var(--text);}
   .prop-row select{background:var(--bg-input);color:var(--text);border:1px solid var(--border);
     border-radius:2px;padding:3px;font-size:12px;}
   .prop-empty{padding:14px 6px;color:var(--text-dim);font-size:12px;text-align:center;}
-
+ 
   /* Command line */
   .command-panel{flex:0 0 auto;background:var(--bg-panel-2);border-top:1px solid var(--border);}
   .command-history{
-    height:70px;overflow-y:auto;padding:4px 8px;font-family:Consolas,"Courier New",monospace;
+    height:38px;overflow-y:auto;padding:4px 8px;font-family:Consolas,"Courier New",monospace;
     font-size:12px;color:var(--text-dim);line-height:1.5;
   }
   .command-history .cmd-echo{color:var(--text);}
@@ -213,10 +227,10 @@
     flex:1;background:transparent;border:none;outline:none;color:var(--text);
     font-family:Consolas,"Courier New",monospace;font-size:12.5px;
   }
-
+ 
   /* Status bar */
   .statusbar{
-    flex:0 0 auto;height:26px;background:var(--bg-menubar);border-top:1px solid var(--border);
+    flex:0 0 auto;height:22px;background:var(--bg-menubar);border-top:1px solid var(--border);
     display:flex;align-items:center;padding:0 8px;gap:4px;font-size:11px;
   }
   .status-coord{font-family:Consolas,monospace;color:var(--text-dim);min-width:150px;}
@@ -234,31 +248,31 @@
 </style>
 </head>
 <body>
-
+ 
 <div class="titlebar">AutoCAD Web — Untitled1.dwg</div>
-
+ 
 <div class="menubar" id="menubar"></div>
-
+ 
 <div class="qat-row" id="qat-row"></div>
-
+ 
 <div class="ribbon-tabs" id="ribbon-tabs"></div>
 <div class="ribbon" id="ribbon"></div>
-
+ 
 <div class="main-area">
-
+ 
   <!-- 🔥 INJECTED: 3D Button 🔥 -->
   <button id="btn-3d-toggle">👁️ Switch to 3D View</button>
-
+ 
   <div class="canvas-wrap" id="canvas-wrap">
     <canvas id="cad-canvas"></canvas>
     <div class="dyn-input" id="dyn-input" style="display:none;"></div>
     <div class="tool-hint" id="tool-hint">Select objects</div>
     <div class="coords-readout" id="coords-readout">X: 0.00  Y: 0.00</div>
   </div>
-
+ 
   <!-- 🔥 INJECTED: 3D Canvas Wrap 🔥 -->
   <div id="canvas-3d-wrap"></div>
-
+ 
   <div class="side-panel">
     <div class="side-tabs">
       <div class="side-tab active" data-tab="layers">Layers</div>
@@ -267,21 +281,24 @@
     <div class="side-content" id="side-content"></div>
   </div>
 </div>
-
+ 
 <div class="command-panel">
   <div class="command-history" id="command-history"></div>
   <div class="command-input-row">
     <span class="prompt">Command:</span>
-    <input id="cmd-input" type="text" autocomplete="off" spellcheck="false" placeholder="type a command (line, rect, circle, polyline, erase, undo, zoom) and press Enter">
+    <input id="cmd-input" type="text" autocomplete="off" spellcheck="false" placeholder="type a command (line, rect, circle, copy, rotate, trim, undo, zoom) and press Enter">
   </div>
 </div>
-
+ 
 <div class="statusbar" id="statusbar"></div>
-
+ 
+<input type="file" id="file-import-input" accept="application/json,.json" style="display:none">
+ 
+ 
 <script>
 (function(){
   "use strict";
-
+ 
   /* ---------- Icons ---------- */
   const ICONS = {
     line: '<svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round"><line x1="4" y1="20" x2="20" y2="4"/></svg>',
@@ -305,12 +322,12 @@
     eye: '<svg viewBox="0 0 24 24" fill="none" stroke-width="1.6"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg>',
     eyeoff: '<svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round"><path d="M3 3l18 18"/><path d="M10.6 5.2A11 11 0 0 1 12 5c7 0 11 7 11 7a13.5 13.5 0 0 1-3.2 3.8M6.5 6.7C3.4 8.6 1 12 1 12s4 7 11 7a10.6 10.6 0 0 0 4-.8"/><path d="M9.5 9.5a3 3 0 0 0 4.2 4.2"/></svg>',
   };
-
+ 
   /* ---------- State ---------- */
   const canvas = document.getElementById('cad-canvas');
   const ctx = canvas.getContext('2d');
   const canvasWrap = document.getElementById('canvas-wrap');
-
+ 
   let view = { offsetX: 0, offsetY: 0, scale: 40 };
   let grid = { visible: true, snap: true };
   let orthoMode = false;
@@ -325,7 +342,7 @@
   ];
   let currentLayer = '0';
   let selected = new Set();
-
+ 
   let drawState = { active: false, type: null, pts: [] };
   let mouseWorld = { x: 0, y: 0 };
   let mouseInCanvas = false;
@@ -333,15 +350,21 @@
   let panState = { active: false, lastX: 0, lastY: 0 };
   let dragState = { active: false, lastWorld: null, moved: false };
   let rubberBand = null;
-
+ 
   let undoStack = [];
   let redoStack = [];
-
+ 
   /* Direct distance entry */
   let typedBuffer = '';
   let inputActive = false;
   let lastScreenPt = { sx: 0, sy: 0 };
-
+ 
+  /* Modify tools: Copy / Rotate / Trim */
+  let copyState = { base:null, sourceIds:[] };
+  let rotateState = { base:null, originals:null };
+  let trimState = { active:false, cuttingIds:new Set(), confirmed:false };
+ 
+ 
   /* ---------- Seed demo drawing ---------- */
   shapes = [
     { id: nextId++, type: 'rect',     pts: [{x:0,y:0},{x:12,y:8}], layer: 'Walls' },
@@ -349,7 +372,7 @@
     { id: nextId++, type: 'circle',   pts: [{x:3,y:4},{x:3,y:6}], layer: '0' },
     { id: nextId++, type: 'polyline', pts: [{x:8,y:2},{x:10,y:2},{x:10,y:5},{x:9,y:6}], layer: 'Dimensions' },
   ];
-
+ 
   /* ---------- Coordinate transforms ---------- */
   function worldToScreen(x, y){
     return { sx: canvas.width/2 + view.offsetX + x*view.scale, sy: canvas.height/2 + view.offsetY - y*view.scale };
@@ -366,7 +389,7 @@
   function applyOrtho(from, to){
     return Math.abs(to.x-from.x) > Math.abs(to.y-from.y) ? { x: to.x, y: from.y } : { x: from.x, y: to.y };
   }
-
+ 
   function parseDistance(str){
     str = str.trim();
     if (!str) return null;
@@ -380,7 +403,7 @@
     if (m) return parseFloat(str);
     return null;
   }
-
+ 
   function directionPoint(from, length){
     let dx = mouseWorld.x-from.x, dy = mouseWorld.y-from.y;
     if (orthoMode && tool==='line'){
@@ -390,8 +413,33 @@
     if (dist < 1e-6){ dx = 1; dy = 0; dist = 1; }
     return { x: from.x + dx/dist*length, y: from.y + dy/dist*length };
   }
-
+ 
+  function parseDimensions(str){
+    const s = str.trim();
+    const m = s.match(/^(.+?)\s*[,xX]\s*(.+)$/);
+    if (!m) return null;
+    const w = parseDistance(m[1].trim());
+    const h = parseDistance(m[2].trim());
+    if (w===null || h===null || isNaN(w) || isNaN(h)) return null;
+    return { w, h };
+  }
+ 
   function commitTypedLength(){
+    if (tool==='rect'){
+      const dims = parseDimensions(typedBuffer);
+      if (!dims){
+        logCmd('Invalid input "' + typedBuffer + '" — try 12x8, 12,8, 12\'x8\', or 12 x 8');
+        typedBuffer = ''; inputActive = false; render();
+        return;
+      }
+      const from = drawState.pts[0];
+      const signX = (mouseWorld.x >= from.x) ? 1 : -1;
+      const signY = (mouseWorld.y >= from.y) ? 1 : -1;
+      const pt = { x: from.x + dims.w*signX, y: from.y + dims.h*signY };
+      typedBuffer = ''; inputActive = false;
+      handleDrawClick(pt);
+      return;
+    }
     const length = parseDistance(typedBuffer);
     if (length===null || isNaN(length)){
       logCmd('Invalid input "' + typedBuffer + '" — try 10, 10\', 6", or 5\'6"');
@@ -409,7 +457,7 @@
       handleDrawClick(pt);
     }
   }
-
+ 
   /* ---------- Geometry helpers ---------- */
   function distToSegment(p, a, b){
     const dx=b.x-a.x, dy=b.y-a.y;
@@ -459,7 +507,7 @@
     }
     return { x1,y1,x2,y2 };
   }
-
+ 
   /* ---------- Undo / redo ---------- */
   function pushUndo(){
     undoStack.push(JSON.stringify(shapes));
@@ -480,12 +528,167 @@
     selected.clear(); updatePropertiesPanel(); render();
     logCmd('* Redo *');
   }
-
+ 
+  /* ---------- Modify tools: COPY ---------- */
+  function startCopy(){
+    if (!selected.size){ logCmd('Select objects first, then use COPY.'); return; }
+    tool = 'copy';
+    copyState = { base:null, sourceIds:[...selected] };
+    document.querySelectorAll('.ribbon-btn[data-tool]').forEach(b=>b.classList.toggle('active', b.dataset.tool===tool));
+    canvas.style.cursor = 'crosshair';
+    toolHint.textContent = HINTS.copy;
+    logCmd('Specify base point:');
+    render();
+  }
+  function performCopyTo(pt){
+    const delta = { x: pt.x-copyState.base.x, y: pt.y-copyState.base.y };
+    pushUndo();
+    const newIds = [];
+    copyState.sourceIds.forEach(id=>{
+      const src = shapes.find(s=>s.id===id);
+      if (!src) return;
+      const clone = { id:nextId++, type:src.type, layer:src.layer, pts: src.pts.map(p=>({x:p.x+delta.x, y:p.y+delta.y})) };
+      shapes.push(clone);
+      newIds.push(clone.id);
+    });
+    selected = new Set(newIds);
+    logCmd(newIds.length + ' copied.');
+    updatePropertiesPanel(); renderLayers();
+    render();
+  }
+  function commitCopyLength(){
+    const length = parseDistance(typedBuffer);
+    typedBuffer = ''; inputActive = false;
+    if (length===null || isNaN(length)){ logCmd('Invalid input.'); render(); return; }
+    const pt = directionPoint(copyState.base, length);
+    performCopyTo(pt);
+    logCmd('Specify second point for another copy, or Esc to finish:');
+  }
+ 
+  /* ---------- Modify tools: ROTATE ---------- */
+  function rotatePoint(p, base, angle){
+    const dx=p.x-base.x, dy=p.y-base.y;
+    const cos=Math.cos(angle), sin=Math.sin(angle);
+    return { x: base.x + dx*cos - dy*sin, y: base.y + dx*sin + dy*cos };
+  }
+  function startRotate(){
+    if (!selected.size){ logCmd('Select objects first, then use ROTATE.'); return; }
+    tool = 'rotate';
+    rotateState = { base:null, originals:null };
+    document.querySelectorAll('.ribbon-btn[data-tool]').forEach(b=>b.classList.toggle('active', b.dataset.tool===tool));
+    canvas.style.cursor = 'crosshair';
+    toolHint.textContent = HINTS.rotate;
+    logCmd('Specify base point:');
+    render();
+  }
+  function finalizeRotate(angle){
+    rotateState.originals.forEach((pts,id)=>{
+      const s = shapes.find(sh=>sh.id===id);
+      if (s) s.pts = pts.map(p=>rotatePoint(p, rotateState.base, angle));
+    });
+    logCmd('Rotated ' + rotateState.originals.size + ' object(s) by ' + (angle*180/Math.PI).toFixed(1) + '°.');
+    rotateState = { base:null, originals:null };
+    setTool('select');
+    render();
+  }
+  function commitRotateAngle(){
+    const deg = parseFloat(typedBuffer);
+    typedBuffer = ''; inputActive = false;
+    if (isNaN(deg)){ logCmd('Invalid angle.'); render(); return; }
+    finalizeRotate(deg*Math.PI/180);
+  }
+ 
+  /* ---------- Modify tools: TRIM ---------- */
+  function lineLineIntersectionT(A,B,C,D){
+    const r = {x:B.x-A.x, y:B.y-A.y};
+    const s = {x:D.x-C.x, y:D.y-C.y};
+    const rxs = r.x*s.y - r.y*s.x;
+    if (Math.abs(rxs) < 1e-9) return null;
+    const qp = {x:C.x-A.x, y:C.y-A.y};
+    const t = (qp.x*s.y - qp.y*s.x)/rxs;
+    const u = (qp.x*r.y - qp.y*r.x)/rxs;
+    if (t>1e-6 && t<1-1e-6 && u>-1e-6 && u<1+1e-6) return t;
+    return null;
+  }
+  function lineCircleIntersectionTs(A,B,c,r){
+    const d = {x:B.x-A.x, y:B.y-A.y};
+    const f = {x:A.x-c.x, y:A.y-c.y};
+    const a = d.x*d.x+d.y*d.y;
+    const b = 2*(f.x*d.x+f.y*d.y);
+    const cc = f.x*f.x+f.y*f.y - r*r;
+    const disc = b*b-4*a*cc;
+    if (disc<0 || a<1e-9) return [];
+    const sq = Math.sqrt(disc);
+    const t1=(-b-sq)/(2*a), t2=(-b+sq)/(2*a);
+    return [t1,t2].filter(t=>t>1e-6 && t<1-1e-6);
+  }
+  function collectTrimTs(target, cuttingShapes){
+    const A=target.pts[0], B=target.pts[1];
+    const ts=[];
+    cuttingShapes.forEach(cs=>{
+      if (cs.id===target.id) return;
+      if (cs.type==='line'){
+        const t=lineLineIntersectionT(A,B,cs.pts[0],cs.pts[1]);
+        if (t!==null) ts.push(t);
+      } else if (cs.type==='rect'){
+        const [a,b]=cs.pts;
+        const x1=Math.min(a.x,b.x), x2=Math.max(a.x,b.x), y1=Math.min(a.y,b.y), y2=Math.max(a.y,b.y);
+        const corners=[{x:x1,y:y1},{x:x2,y:y1},{x:x2,y:y2},{x:x1,y:y2}];
+        for(let i=0;i<4;i++){ const t=lineLineIntersectionT(A,B,corners[i],corners[(i+1)%4]); if(t!==null) ts.push(t); }
+      } else if (cs.type==='polyline'){
+        for(let i=0;i<cs.pts.length-1;i++){ const t=lineLineIntersectionT(A,B,cs.pts[i],cs.pts[i+1]); if(t!==null) ts.push(t); }
+      } else if (cs.type==='circle'){
+        const c=cs.pts[0], r=Math.hypot(cs.pts[1].x-c.x, cs.pts[1].y-c.y);
+        lineCircleIntersectionTs(A,B,c,r).forEach(t=>ts.push(t));
+      }
+    });
+    return ts;
+  }
+  function performTrim(target, clickPt, cuttingShapes){
+    if (target.type!=='line'){
+      logCmd('TRIM only supports straight lines in this demo.');
+      return;
+    }
+    const A=target.pts[0], B=target.pts[1];
+    const dx=B.x-A.x, dy=B.y-A.y;
+    const lenSq = dx*dx+dy*dy || 1;
+    let tClick = ((clickPt.x-A.x)*dx + (clickPt.y-A.y)*dy)/lenSq;
+    tClick = clamp(tClick,0,1);
+    const interior = collectTrimTs(target, cuttingShapes).sort((a,b)=>a-b);
+    if (!interior.length){ logCmd('No intersection found — nothing trimmed.'); return; }
+    let tLow=0, tHigh=1;
+    interior.forEach(t=>{
+      if (t<=tClick && t>tLow) tLow=t;
+      if (t>=tClick && t<tHigh) tHigh=t;
+    });
+    pushUndo();
+    const newShapes=[];
+    if (tLow>1e-6) newShapes.push({ id:nextId++, type:'line', layer:target.layer, pts:[ {x:A.x,y:A.y}, {x:A.x+dx*tLow,y:A.y+dy*tLow} ] });
+    if (tHigh<1-1e-6) newShapes.push({ id:nextId++, type:'line', layer:target.layer, pts:[ {x:A.x+dx*tHigh,y:A.y+dy*tHigh}, {x:B.x,y:B.y} ] });
+    shapes = shapes.filter(s=>s.id!==target.id).concat(newShapes);
+    selected = new Set(newShapes.map(s=>s.id));
+    logCmd('1 object trimmed.');
+    updatePropertiesPanel(); renderLayers();
+    render();
+  }
+  function startTrim(){
+    tool = 'trim';
+    trimState = { active:true, cuttingIds:new Set(), confirmed:false };
+    selected.clear();
+    document.querySelectorAll('.ribbon-btn[data-tool]').forEach(b=>b.classList.toggle('active', b.dataset.tool===tool));
+    canvas.style.cursor = 'crosshair';
+    toolHint.textContent = HINTS.trim;
+    logCmd('Select cutting edges, then press Enter. Press Enter immediately to use all objects as cutting edges.');
+    updatePropertiesPanel(); renderLayers();
+    render();
+  }
+ 
+ 
   /* ---------- Command line ---------- */
   const historyEl = document.getElementById('command-history');
   const cmdInput = document.getElementById('cmd-input');
   let cmdLog = ['AutoCAD Web starting sequence complete.'];
-
+ 
   function logCmd(msg){
     cmdLog.push(msg);
     if (cmdLog.length>200) cmdLog.shift();
@@ -500,6 +703,8 @@
     if (!text) return;
     logCmd('<span class="cmd-echo">Command: ' + escapeHtml(text) + '</span>');
     const t = text.toLowerCase();
+    const startMap = { co:startCopy, copy:startCopy, ro:startRotate, rotate:startRotate, tr:startTrim, trim:startTrim };
+    if (startMap[t]){ startMap[t](); return; }
     const map = {
       l:'line', line:'line',
       rec:'rect', rectangle:'rect', rect:'rect',
@@ -521,19 +726,36 @@
     logCmd('Unknown command "' + text + '". Press F1 for help.');
   }
   cmdInput.addEventListener('keydown', e=>{
-    if (e.key==='Enter'){ runCommand(cmdInput.value); cmdInput.value=''; }
+    if (e.key==='Enter'){
+      const raw = cmdInput.value;
+      // 🎯 Agar rectangle/line/circle/polyline draw ho rahi hai, to Command line mein type ki gayi
+      // dimension bhi accept karo (jaise "12,8" ya "12x8") — sirf canvas pe direct type karna zaroori nahi
+      const drawingInProgress = drawState.active && (tool==='line' || tool==='polyline' || tool==='circle' || tool==='rect');
+      if (drawingInProgress && raw.trim()){
+        typedBuffer = raw.trim();
+        inputActive = false;
+        commitTypedLength();
+        cmdInput.value = '';
+        return;
+      }
+      runCommand(raw);
+      cmdInput.value='';
+    }
   });
-
+ 
   /* ---------- Tool switching ---------- */
   const toolHint = document.getElementById('tool-hint');
   const HINTS = {
     select: 'Select objects — drag to move, drag empty space to box-select',
     line: 'LINE — click first point, then click, or type a length (10, 10\', 6", 5\'6") + Enter',
-    rect: 'RECTANGLE — specify first corner, then opposite corner',
+    rect: 'RECTANGLE — specify first corner, then click opposite corner, or type dimensions (12x8 or 12,8) in the Command line + Enter',
     circle: 'CIRCLE — click center, then click, or type a radius (10, 10\', 6") + Enter',
     polyline: 'POLYLINE — click points, or type lengths + Enter; double-click/Enter to finish',
     erase: 'ERASE — click an object to delete it',
     pan: 'PAN — click and drag to pan the view',
+    copy: 'COPY — specify base point, then destination point (or type a distance) + Enter',
+    rotate: 'ROTATE — specify base point, then drag to rotate or type degrees + Enter',
+    trim: 'TRIM — click cutting edge(s), press Enter, then click the segment(s) to trim',
   };
   function setTool(name){
     tool = name;
@@ -546,7 +768,7 @@
     logCmd(name.toUpperCase());
     render();
   }
-
+ 
   /* ---------- Drawing click handling ---------- */
   function handleDrawClick(pt){
     if (!drawState.active){
@@ -570,25 +792,25 @@
     }
     render();
   }
-
+ 
   /* ---------- Mouse interaction ---------- */
   function canvasPoint(e){
     const rect = canvas.getBoundingClientRect();
     return { sx: e.clientX-rect.left, sy: e.clientY-rect.top };
   }
-
+ 
   canvas.addEventListener('mousedown', e=>{
     const { sx, sy } = canvasPoint(e);
     const world = screenToWorld(sx, sy);
     const snapped = snapPoint(world);
-
+ 
     if (isSpaceDown || e.button===1 || tool==='pan'){
       panState = { active:true, lastX:e.clientX, lastY:e.clientY };
       canvas.style.cursor = 'grabbing';
       return;
     }
     if (e.button!==0) return;
-
+ 
     if (tool==='line' || tool==='rect' || tool==='circle'){
       handleDrawClick(snapped);
       return;
@@ -612,6 +834,54 @@
       }
       return;
     }
+    if (tool==='copy'){
+      if (!copyState.base){
+        copyState.base = snapped;
+        logCmd('Specify second point of displacement, or type a distance:');
+        render();
+      } else {
+        performCopyTo(snapped);
+        logCmd('Specify second point for another copy, or Esc to finish:');
+      }
+      return;
+    }
+    if (tool==='rotate'){
+      if (!rotateState.base){
+        pushUndo();
+        rotateState.base = snapped;
+        rotateState.originals = new Map();
+        selected.forEach(id=>{
+          const s = shapes.find(sh=>sh.id===id);
+          if (s) rotateState.originals.set(id, s.pts.map(p=>({x:p.x,y:p.y})));
+        });
+        logCmd('Specify rotation angle, or type degrees and press Enter:');
+        render();
+      } else {
+        const angle = Math.atan2(mouseWorld.y-rotateState.base.y, mouseWorld.x-rotateState.base.x);
+        finalizeRotate(angle);
+      }
+      return;
+    }
+    if (tool==='trim'){
+      const hit = hitTestShapes(world);
+      if (!trimState.confirmed){
+        if (hit){
+          if (trimState.cuttingIds.has(hit.id)) trimState.cuttingIds.delete(hit.id);
+          else trimState.cuttingIds.add(hit.id);
+          selected = new Set(trimState.cuttingIds);
+          updatePropertiesPanel(); renderLayers();
+          render();
+        }
+      } else {
+        if (hit){
+          const cuttingShapes = trimState.cuttingIds.size ? shapes.filter(s=>trimState.cuttingIds.has(s.id)) : shapes;
+          performTrim(hit, world, cuttingShapes);
+        } else {
+          logCmd('Nothing found.');
+        }
+      }
+      return;
+    }
     if (tool==='select'){
       const hit = hitTestShapes(world);
       if (hit){
@@ -627,13 +897,23 @@
       render();
     }
   });
-
+ 
   canvas.addEventListener('mousemove', e=>{
     const { sx, sy } = canvasPoint(e);
     lastScreenPt = { sx, sy };
     mouseWorld = screenToWorld(sx, sy);
     updateCoordsReadout(mouseWorld);
-
+ 
+    if (tool==='rotate' && rotateState.base){
+      const angle = Math.atan2(mouseWorld.y-rotateState.base.y, mouseWorld.x-rotateState.base.x);
+      rotateState.originals.forEach((pts,id)=>{
+        const s = shapes.find(sh=>sh.id===id);
+        if (s) s.pts = pts.map(p=>rotatePoint(p, rotateState.base, angle));
+      });
+      render();
+      return;
+    }
+ 
     if (panState.active){
       const dx = e.clientX-panState.lastX, dy = e.clientY-panState.lastY;
       view.offsetX += dx; view.offsetY += dy;
@@ -656,10 +936,10 @@
     }
     render();
   });
-
+ 
   canvas.addEventListener('mouseenter', ()=>{ mouseInCanvas = true; });
   canvas.addEventListener('mouseleave', ()=>{ mouseInCanvas = false; render(); });
-
+ 
   window.addEventListener('mouseup', ()=>{
     if (panState.active){ panState.active=false; canvas.style.cursor = tool==='pan'?'grab':(tool==='select'?'default':'crosshair'); }
     if (dragState.active){ dragState.active=false; updatePropertiesPanel(); }
@@ -680,7 +960,7 @@
       render();
     }
   });
-
+ 
   canvas.addEventListener('dblclick', ()=>{
     if (drawState.active && drawState.type==='polyline' && drawState.pts.length>=2){
       pushUndo();
@@ -690,7 +970,7 @@
       render();
     }
   });
-
+ 
   canvas.addEventListener('wheel', e=>{
     e.preventDefault();
     const { sx, sy } = canvasPoint(e);
@@ -702,34 +982,67 @@
     updateZoomPct();
     render();
   }, { passive:false });
-
+ 
   canvas.addEventListener('contextmenu', e=>e.preventDefault());
-
+ 
   /* ---------- Keyboard ---------- */
   window.addEventListener('keydown', e=>{
     const tag = document.activeElement.tagName;
     if (tag==='INPUT' || tag==='SELECT' || tag==='TEXTAREA') return;
-
+ 
     if (e.code==='Space'){ isSpaceDown=true; canvas.style.cursor='grab'; e.preventDefault(); return; }
-
-    const typing = drawState.active && (tool==='line' || tool==='polyline' || tool==='circle');
-    if (typing && /^[0-9.'"]$/.test(e.key)){
+ 
+    const typing = drawState.active && (tool==='line' || tool==='polyline' || tool==='circle' || tool==='rect');
+    let charPattern = null;
+    if (drawState.active && (tool==='line' || tool==='polyline' || tool==='circle')) charPattern = /^[0-9.'"]$/;
+    else if (drawState.active && tool==='rect') charPattern = /^[0-9.'",xX]$/;
+    else if (tool==='rotate' && rotateState.base) charPattern = /^[0-9.-]$/;
+    else if (tool==='copy' && copyState.base) charPattern = /^[0-9.'"]$/;
+ 
+    if (charPattern && charPattern.test(e.key)){
       typedBuffer += e.key;
       inputActive = true;
       e.preventDefault();
       render();
       return;
     }
-    if (typing && typedBuffer && e.key==='Backspace'){
+    if (charPattern && typedBuffer && e.key==='Backspace'){
       typedBuffer = typedBuffer.slice(0,-1);
       inputActive = typedBuffer.length>0;
       e.preventDefault();
       render();
       return;
     }
-
+ 
     if (e.key==='Escape'){
       if (typedBuffer){ typedBuffer=''; inputActive=false; render(); return; }
+      if (tool==='rotate' && rotateState.base){
+        rotateState.originals.forEach((pts,id)=>{
+          const s = shapes.find(sh=>sh.id===id);
+          if (s) s.pts = pts.map(p=>({x:p.x,y:p.y}));
+        });
+        rotateState = { base:null, originals:null };
+        setTool('select');
+        logCmd('*Cancel*');
+        render();
+        return;
+      }
+      if (tool==='copy'){
+        copyState = { base:null, sourceIds:[] };
+        setTool('select');
+        logCmd('*Cancel*');
+        render();
+        return;
+      }
+      if (tool==='trim'){
+        trimState = { active:false, cuttingIds:new Set(), confirmed:false };
+        selected.clear();
+        setTool('select');
+        updatePropertiesPanel(); renderLayers();
+        logCmd('*Cancel*');
+        render();
+        return;
+      }
       drawState = { active:false, type:null, pts:[] };
       selected.clear(); rubberBand=null;
       updatePropertiesPanel(); renderLayers();
@@ -737,7 +1050,15 @@
       render(); return;
     }
     if (e.key==='Enter'){
+      if (tool==='rotate' && rotateState.base && typedBuffer){ commitRotateAngle(); return; }
+      if (tool==='copy' && copyState.base && typedBuffer){ commitCopyLength(); return; }
       if (typing && typedBuffer){ commitTypedLength(); return; }
+      if (tool==='trim' && !trimState.confirmed){
+        trimState.confirmed = true;
+        toolHint.textContent = 'TRIM — click the segment to trim';
+        logCmd('Select object to trim, or Esc to exit.');
+        return;
+      }
       if (drawState.active && drawState.type==='polyline' && drawState.pts.length>=2){
         pushUndo();
         shapes.push({ id:nextId++, type:'polyline', pts:drawState.pts.slice(), layer:currentLayer });
@@ -763,7 +1084,7 @@
     }
     if (e.ctrlKey && e.key.toLowerCase()==='z'){ e.preventDefault(); undo(); return; }
     if (e.ctrlKey && (e.key.toLowerCase()==='y')){ e.preventDefault(); redo(); return; }
-
+ 
     const map = { l:'line', r:'rect', c:'circle', p:'polyline', e:'erase', v:'select', s:'select' };
     const k = e.key.toLowerCase();
     if (!e.ctrlKey && !e.metaKey && map[k]) setTool(map[k]);
@@ -771,7 +1092,7 @@
   window.addEventListener('keyup', e=>{
     if (e.code==='Space'){ isSpaceDown=false; canvas.style.cursor = tool==='select'?'default':(tool==='pan'?'grab':'crosshair'); }
   });
-
+ 
   /* ---------- Zoom extents ---------- */
   function zoomExtents(){
     if (!shapes.length){ view.scale=40; view.offsetX=0; view.offsetY=0; updateZoomPct(); render(); return; }
@@ -786,7 +1107,7 @@
     updateZoomPct();
     render();
   }
-
+ 
   /* ---------- Rendering ---------- */
   function drawGrid(){
     if (!grid.visible) return;
@@ -806,7 +1127,7 @@
     ctx.beginPath(); ctx.moveTo(0, origin.sy); ctx.lineTo(canvas.width, origin.sy); ctx.stroke();
     ctx.beginPath(); ctx.moveTo(origin.sx, 0); ctx.lineTo(origin.sx, canvas.height); ctx.stroke();
   }
-
+ 
   function drawShape(s, isSelected){
     const layer = layers.find(l=>l.name===s.layer) || layers[0];
     if (!layer.visible) return;
@@ -832,7 +1153,7 @@
       s.pts.forEach(p=>{ const sp=worldToScreen(p.x,p.y); ctx.fillRect(sp.sx-3,sp.sy-3,6,6); });
     }
   }
-
+ 
   function drawPreview(){
     if (!drawState.active) return;
     const layer = layers.find(l=>l.name===currentLayer);
@@ -858,39 +1179,68 @@
     ctx.stroke();
     ctx.setLineDash([]);
   }
-
+ 
   function drawCrosshair(){
     const p = worldToScreen(mouseWorld.x, mouseWorld.y);
     ctx.strokeStyle = 'rgba(216,216,216,0.3)'; ctx.lineWidth = 1;
     ctx.beginPath(); ctx.moveTo(p.sx,0); ctx.lineTo(p.sx,canvas.height); ctx.stroke();
     ctx.beginPath(); ctx.moveTo(0,p.sy); ctx.lineTo(canvas.width,p.sy); ctx.stroke();
   }
-
+ 
   function updateDynInput(){
     const el = document.getElementById('dyn-input');
-    const showing = drawState.active && (tool==='line' || tool==='polyline' || tool==='circle' || tool==='rect') && mouseInCanvas;
-    if (!showing){ el.style.display = 'none'; return; }
-    const from = drawState.pts[drawState.pts.length-1];
-    let text;
-    if (typedBuffer){
-      text = typedBuffer + (inputActive ? '_' : '');
-    } else if (tool==='circle'){
-      const r = Math.hypot(mouseWorld.x-drawState.pts[0].x, mouseWorld.y-drawState.pts[0].y);
-      text = 'R ' + r.toFixed(2) + "'";
-    } else if (tool==='rect'){
-      const dx = Math.abs(mouseWorld.x-from.x), dy = Math.abs(mouseWorld.y-from.y);
-      text = dx.toFixed(2) + "' x " + dy.toFixed(2) + "'";
-    } else {
-      const dist = Math.hypot(mouseWorld.x-from.x, mouseWorld.y-from.y);
-      const angle = Math.atan2(mouseWorld.y-from.y, mouseWorld.x-from.x)*180/Math.PI;
-      text = dist.toFixed(2) + "' < " + angle.toFixed(0) + "°";
+    let text = null;
+    if (drawState.active && (tool==='line' || tool==='polyline' || tool==='circle' || tool==='rect') && mouseInCanvas){
+      const from = drawState.pts[drawState.pts.length-1];
+      if (typedBuffer){
+        text = typedBuffer + (inputActive ? '_' : '');
+      } else if (tool==='circle'){
+        const r = Math.hypot(mouseWorld.x-drawState.pts[0].x, mouseWorld.y-drawState.pts[0].y);
+        text = 'R ' + r.toFixed(2) + "'";
+      } else if (tool==='rect'){
+        const dx = Math.abs(mouseWorld.x-from.x), dy = Math.abs(mouseWorld.y-from.y);
+        text = dx.toFixed(2) + "' x " + dy.toFixed(2) + "'";
+      } else {
+        const dist = Math.hypot(mouseWorld.x-from.x, mouseWorld.y-from.y);
+        const angle = Math.atan2(mouseWorld.y-from.y, mouseWorld.x-from.x)*180/Math.PI;
+        text = dist.toFixed(2) + "' < " + angle.toFixed(0) + "°";
+      }
+    } else if (tool==='copy' && copyState.base && mouseInCanvas){
+      if (typedBuffer){
+        text = typedBuffer + (inputActive ? '_' : '');
+      } else {
+        const dist = Math.hypot(mouseWorld.x-copyState.base.x, mouseWorld.y-copyState.base.y);
+        const angle = Math.atan2(mouseWorld.y-copyState.base.y, mouseWorld.x-copyState.base.x)*180/Math.PI;
+        text = dist.toFixed(2) + "' < " + angle.toFixed(0) + "°";
+      }
+    } else if (tool==='rotate' && rotateState.base && mouseInCanvas){
+      if (typedBuffer){
+        text = typedBuffer + (inputActive ? '_' : '') + '°';
+      } else {
+        const angle = Math.atan2(mouseWorld.y-rotateState.base.y, mouseWorld.x-rotateState.base.x)*180/Math.PI;
+        text = angle.toFixed(1) + "°";
+      }
     }
+    if (text===null){ el.style.display = 'none'; return; }
     el.textContent = text;
     el.style.display = 'block';
     el.style.left = (lastScreenPt.sx+16) + 'px';
     el.style.top = (lastScreenPt.sy+16) + 'px';
   }
-
+ 
+  function drawModifyPreview(){
+    if ((tool==='copy' && copyState.base) || (tool==='rotate' && rotateState.base)){
+      const base = tool==='copy' ? copyState.base : rotateState.base;
+      const a = worldToScreen(base.x, base.y);
+      const b = worldToScreen(mouseWorld.x, mouseWorld.y);
+      ctx.strokeStyle = '#4a9eff'; ctx.setLineDash([4,3]); ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(a.sx,a.sy); ctx.lineTo(b.sx,b.sy); ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle = '#4a9eff';
+      ctx.beginPath(); ctx.arc(a.sx,a.sy,4,0,Math.PI*2); ctx.fill();
+    }
+  }
+ 
   function render(){
     ctx.clearRect(0,0,canvas.width,canvas.height);
     ctx.fillStyle = '#1b1d1f';
@@ -898,6 +1248,7 @@
     drawGrid();
     shapes.forEach(s=>drawShape(s, selected.has(s.id)));
     drawPreview();
+    drawModifyPreview();
     if (rubberBand){
       ctx.strokeStyle='#4a9eff'; ctx.fillStyle='rgba(74,158,255,0.15)'; ctx.lineWidth=1;
       const x=Math.min(rubberBand.x1,rubberBand.x2), y=Math.min(rubberBand.y1,rubberBand.y2);
@@ -907,14 +1258,14 @@
     if (mouseInCanvas) drawCrosshair();
     updateDynInput();
   }
-
+ 
   function updateCoordsReadout(pt){
     document.getElementById('coords-readout').textContent = 'X: ' + pt.x.toFixed(2) + '   Y: ' + pt.y.toFixed(2);
   }
   function updateZoomPct(){
     document.getElementById('zoom-pct').textContent = Math.round(view.scale/40*100) + '%';
   }
-
+ 
   /* ---------- Resize ---------- */
   function resizeCanvas(){
     canvas.width = canvasWrap.clientWidth || 800;
@@ -932,17 +1283,97 @@
       renderer3D.setSize(wrap3D.clientWidth, wrap3D.clientHeight);
     }
   });
-
+ 
   if (typeof ResizeObserver !== 'undefined'){
     try { new ResizeObserver(resizeCanvas).observe(canvasWrap); } catch(err){}
   }
-
+ 
   /* ================= UI CHROME ================= */
-
+ 
   /* Menu bar */
   const MENUS = ['File','Edit','View','Insert','Format','Tools','Draw','Dimension','Modify','Parametric','Window','Help'];
-  document.getElementById('menubar').innerHTML = MENUS.map(m=>'<div class="menu-item">'+m+'</div>').join('');
-
+  document.getElementById('menubar').innerHTML = MENUS.map(m=>{
+    if (m==='File'){
+      return '<div class="menu-item file-menu" id="menu-file">File'+
+        '<div class="file-dropdown" id="file-dropdown">'+
+          '<div class="file-dropdown-item" data-action="new">🗎 New</div>'+
+          '<div class="file-dropdown-item" data-action="open">📂 Open…</div>'+
+          '<div class="file-dropdown-item" data-action="save">💾 Save</div>'+
+          '<div class="file-dropdown-item" data-action="saveas">💾 Save As…</div>'+
+        '</div>'+
+      '</div>';
+    }
+    return '<div class="menu-item">'+m+'</div>';
+  }).join('');
+ 
+  /* ---------- File import / export (System se file uthana + save karna) ---------- */
+  const fileImportInput = document.getElementById('file-import-input');
+ 
+  function exportDrawingJSON(filename){
+    const data = { shapes, layers, currentLayer, savedAt: new Date().toISOString() };
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename || 'drawing.json';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    logCmd('Saved to "' + a.download + '".');
+  }
+ 
+  function importDrawingJSON(file){
+    const reader = new FileReader();
+    reader.onload = (e)=>{
+      try{
+        const data = JSON.parse(e.target.result);
+        if (!Array.isArray(data.shapes)) throw new Error('no "shapes" array found in this file');
+        pushUndo();
+        shapes = data.shapes;
+        nextId = shapes.reduce((max,s)=>Math.max(max, s.id||0), 0) + 1;
+        if (Array.isArray(data.layers) && data.layers.length) layers = data.layers;
+        if (data.currentLayer && layers.find(l=>l.name===data.currentLayer)) currentLayer = data.currentLayer;
+        selected.clear();
+        renderLayers();
+        updatePropertiesPanel();
+        zoomExtents();
+        logCmd('Opened "' + file.name + '" — ' + shapes.length + ' object(s) loaded.');
+      } catch(err){
+        logCmd('Could not open "' + file.name + '": ' + err.message);
+      }
+    };
+    reader.onerror = ()=> logCmd('Error reading "' + file.name + '".');
+    reader.readAsText(file);
+  }
+ 
+  fileImportInput.addEventListener('change', (e)=>{
+    const file = e.target.files[0];
+    if (file) importDrawingJSON(file);
+    fileImportInput.value = ''; // reset so re-selecting the same file still fires change
+  });
+ 
+  function runFileAction(action){
+    if (action==='new'){ document.getElementById('qa-new').click(); }
+    else if (action==='open'){ fileImportInput.click(); }
+    else if (action==='save'){ exportDrawingJSON('Untitled1.dwg.json'); }
+    else if (action==='saveas'){
+      const name = prompt('Save as (filename):', 'drawing.json');
+      if (name) exportDrawingJSON(name.toLowerCase().endsWith('.json') ? name : name + '.json');
+    }
+  }
+ 
+  document.getElementById('menu-file').addEventListener('click', (e)=>{
+    e.stopPropagation();
+    if (e.target.closest('.file-dropdown-item')){
+      runFileAction(e.target.closest('.file-dropdown-item').dataset.action);
+      document.getElementById('file-dropdown').classList.remove('open');
+      return;
+    }
+    document.getElementById('file-dropdown').classList.toggle('open');
+  });
+  window.addEventListener('click', ()=> document.getElementById('file-dropdown').classList.remove('open'));
+ 
   /* Quick access toolbar */
   const qat = document.getElementById('qat-row');
   function qatBtn(id, icon, title){ return '<button class="qat-btn" id="'+id+'" title="'+title+'">'+icon+'</button>'; }
@@ -955,11 +1386,11 @@
     qatBtn('qa-redo', ICONS.redo, 'Redo (Ctrl+Y)') +
     '<span class="qat-title">Untitled1.dwg</span>';
   document.getElementById('qa-new').onclick = ()=>{ pushUndo(); shapes=[]; selected.clear(); updatePropertiesPanel(); logCmd('New drawing started.'); render(); };
-  document.getElementById('qa-open').onclick = ()=> logCmd('OPEN — file access is not available in this demo.');
-  document.getElementById('qa-save').onclick = ()=> logCmd('SAVE — file access is not available in this demo.');
+  document.getElementById('qa-open').onclick = ()=> fileImportInput.click();
+  document.getElementById('qa-save').onclick = ()=> exportDrawingJSON('Untitled1.dwg.json');
   document.getElementById('qa-undo').onclick = undo;
   document.getElementById('qa-redo').onclick = redo;
-
+ 
   /* Ribbon tabs */
   const RIBBON_TABS = ['Home','Insert','Annotate','Parametric','View','Manage','Output'];
   const tabsEl = document.getElementById('ribbon-tabs');
@@ -971,7 +1402,7 @@
     el.classList.add('active');
     buildRibbon(el.dataset.tab);
   });
-
+ 
   const ribbonEl = document.getElementById('ribbon');
   function ribbonBtn(toolName, icon, label){
     return '<button class="ribbon-btn" data-tool="'+toolName+'" title="'+label+'">'+icon+'<span>'+label+'</span></button>';
@@ -995,9 +1426,9 @@
       '<div class="ribbon-group">'+
         '<div class="ribbon-group-buttons">'+
           ribbonBtn('select', ICONS.move, 'Move') +
-          ribbonBtn('copy-stub', ICONS.copy, 'Copy') +
-          ribbonBtn('rotate-stub', ICONS.rotate, 'Rotate') +
-          ribbonBtn('trim-stub', ICONS.trim, 'Trim') +
+          ribbonBtn('copy', ICONS.copy, 'Copy') +
+          ribbonBtn('rotate', ICONS.rotate, 'Rotate') +
+          ribbonBtn('trim', ICONS.trim, 'Trim') +
           ribbonBtn('erase', ICONS.erase, 'Erase') +
         '</div>'+
         '<div class="ribbon-group-label">Modify</div>'+
@@ -1018,10 +1449,13 @@
         '</div>'+
         '<div class="ribbon-group-label">Navigate</div>'+
       '</div>';
-
+ 
     ribbonEl.querySelectorAll('.ribbon-btn[data-tool]').forEach(btn=>{
       btn.addEventListener('click', ()=>{
         const t = btn.dataset.tool;
+        if (t==='copy'){ startCopy(); return; }
+        if (t==='rotate'){ startRotate(); return; }
+        if (t==='trim'){ startTrim(); return; }
         if (t.endsWith('-stub')){
           logCmd('*Cancel* — this tool is not available in this demo.');
           return;
@@ -1040,7 +1474,7 @@
     document.querySelectorAll('.ribbon-btn[data-tool="'+tool+'"]').forEach(b=>b.classList.add('active'));
   }
   buildRibbon('Home');
-
+ 
   /* Side panel: Layers / Properties */
   const sideTabs = document.querySelectorAll('.side-tab');
   const sideContent = document.getElementById('side-content');
@@ -1049,7 +1483,7 @@
     t.classList.add('active');
     if (t.dataset.tab==='layers') renderLayers(); else updatePropertiesPanel();
   }));
-
+ 
   function renderLayers(){
     if (!document.querySelector('.side-tab.active[data-tab="layers"]')) return;
     sideContent.innerHTML =
@@ -1061,7 +1495,7 @@
           '<button class="layer-eye" data-eye="'+l.name+'" title="Toggle visibility">'+(l.visible?ICONS.eye:ICONS.eyeoff)+'</button>'+
         '</div>'
       ).join('');
-
+ 
     sideContent.querySelectorAll('.layer-row').forEach(row=>{
       row.addEventListener('click', e=>{
         if (e.target.closest('[data-swatch]') || e.target.closest('[data-eye]')) return;
@@ -1089,7 +1523,7 @@
       });
     });
   }
-
+ 
   function updatePropertiesPanel(){
     if (!document.querySelector('.side-tab.active[data-tab="props"]')) return;
     if (selected.size===0){
@@ -1119,7 +1553,7 @@
       render();
     });
   }
-
+ 
   /* Status bar */
   const statusbar = document.getElementById('statusbar');
   statusbar.innerHTML =
@@ -1140,28 +1574,28 @@
   document.getElementById('st-ortho').onclick = function(){ orthoMode=!orthoMode; this.classList.toggle('on',orthoMode); };
   document.getElementById('st-polar').onclick = function(){ this.classList.toggle('on'); };
   document.getElementById('st-osnap').onclick = function(){ this.classList.toggle('on'); };
-
+ 
   function updateCoordsReadoutStatus(pt){
     const el = document.getElementById('status-coord');
     if (el) el.textContent = 'X: ' + pt.x.toFixed(2) + '  Y: ' + pt.y.toFixed(2);
   }
   const originalUpdateCoords = updateCoordsReadout;
   window.addEventListener('mousemove', ()=>{ updateCoordsReadoutStatus(mouseWorld); });
-
+ 
   /* ---------- Init ---------- */
   renderLayers();
   updatePropertiesPanel();
   setTool('select');
   resizeCanvas();
   zoomExtents();
-  logCmd('Type a command below, or use the ribbon. Shortcuts: L line · R rectangle · C circle · P polyline · E erase · Esc cancel · Del delete.');
+  logCmd('Type a command below, or use the ribbon. Shortcuts: L line · R rectangle · C circle · P polyline · E erase · Esc cancel · Del delete. Modify: CO copy · RO rotate · TR trim.');
   setTimeout(resizeCanvas, 50);
-
-
+ 
+ 
   /* ================= INJECTED: 3D ENGINE INTEGRATION ================= */
   let is3DMode = false;
   let scene3D, camera3D, renderer3D, controls3D;
-
+ 
   function init3D() {
     const wrap3D = document.getElementById('canvas-3d-wrap');
     
@@ -1172,13 +1606,13 @@
     // Camera
     camera3D = new THREE.PerspectiveCamera(45, wrap3D.clientWidth / wrap3D.clientHeight, 1, 1000);
     camera3D.position.set(0, 40, 50);
-
+ 
     // Renderer
     renderer3D = new THREE.WebGLRenderer({ antialias: true });
     renderer3D.setSize(wrap3D.clientWidth, wrap3D.clientHeight);
     renderer3D.shadowMap.enabled = true;
     wrap3D.appendChild(renderer3D.domElement);
-
+ 
     // Lighting
     const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
     scene3D.add(ambientLight);
@@ -1187,18 +1621,18 @@
     dirLight.position.set(20, 40, 20);
     dirLight.castShadow = true;
     scene3D.add(dirLight);
-
+ 
     // Controls
     controls3D = new THREE.OrbitControls(camera3D, renderer3D.domElement);
     controls3D.maxPolarAngle = Math.PI / 2.1; // Don't go below ground
-
+ 
     // 3D Grid Floor
     const gridHelper = new THREE.GridHelper(200, 200, 0x94a3b8, 0xcbd5e1);
     scene3D.add(gridHelper);
-
+ 
     animate3D();
   }
-
+ 
   function animate3D() {
     requestAnimationFrame(animate3D);
     if(is3DMode && renderer3D) {
@@ -1206,52 +1640,43 @@
       renderer3D.render(scene3D, camera3D);
     }
   }
-
-  
-function build3DScene() {
-    // 1. Purani deewaron ko clear karo
+ 
+  function build3DScene() {
+    // 1. Remove old walls
     const objectsToRemove = [];
     scene3D.children.forEach(child => {
         if (child.name === "wall") objectsToRemove.push(child);
     });
     objectsToRemove.forEach(child => scene3D.remove(child));
-
+ 
+    // 2. Material for walls
     const material = new THREE.MeshStandardMaterial({ color: '#e2e8f0', roughness: 0.6 });
-
-    // 🌟 Naya Magic: Ghar ki boundary (Bounding Box) track karne ke variables
-    let minX = Infinity, maxX = -Infinity, minZ = Infinity, maxZ = -Infinity;
-    let hasWalls = false;
-
+ 
+    // 3. Helper function to create a 3D wall from two 2D points
     function createWall3D(p1, p2) {
         const dx = p2.x - p1.x;
-        const dz = -(p2.y - p1.y); // Mirror issue fixed
+        const dz = -(p2.y - p1.y); // Minus (-) sign lagaya taake mirror issue fix ho!
         const length = Math.hypot(dx, dz);
         
         if(length < 0.1) return; 
         
         const angle = -Math.atan2(dz, dx);
         const midX = (p1.x + p2.x) / 2;
-        const midZ = -(p1.y + p2.y) / 2;
-
-        // Bounding Box update karo (taake ghar ka center pata chal sakay)
-        minX = Math.min(minX, p1.x, p2.x);
-        maxX = Math.max(maxX, p1.x, p2.x);
-        minZ = Math.min(minZ, -p1.y, -p2.y);
-        maxZ = Math.max(maxZ, -p1.y, -p2.y);
-        hasWalls = true;
-
-        const geometry = new THREE.BoxGeometry(length, 10, 0.5); 
+        const midZ = -(p1.y + p2.y) / 2; // Yahan bhi Minus (-) sign lagaya!
+ 
+        const geometry = new THREE.BoxGeometry(length, 20, 0.5); 
         const mesh = new THREE.Mesh(geometry, material);
-        mesh.position.set(midX, 5, midZ); 
+        mesh.position.set(midX, 10, midZ); 
         mesh.rotation.y = angle;
         mesh.name = "wall";
         mesh.castShadow = true;
         mesh.receiveShadow = true;
         scene3D.add(mesh);
     }
-
+    // 4. Iterate over 2D shapes and extrude them into 3D walls
     shapes.forEach(s => {
-        if (s.layer === 'Text') return; 
+        // Skip layers that shouldn't be walls
+        if (s.layer === 'Text') return;
         
         if (s.type === 'line') {
             createWall3D(s.pts[0], s.pts[1]);
@@ -1267,26 +1692,8 @@ function build3DScene() {
             }
         }
     });
-
-    // 🎯 AUTO-CENTER CAMERA & GRID
-    if (hasWalls && controls3D && camera3D) {
-        // Ghar ka center point nikalo
-        const centerX = (minX + maxX) / 2;
-        const centerZ = (minZ + maxZ) / 2;
-        
-        // Camera ko set karo taake seedha ghar par focus ho
-        controls3D.target.set(centerX, 0, centerZ);
-        camera3D.position.set(centerX, 60, centerZ + 70); // Camera thoda upar aur peechay
-        controls3D.update();
-
-        // Zameen (Grid) ko utha kar exact ghar ke neechay rakh do!
-        scene3D.children.forEach(child => {
-            if (child.type === 'GridHelper') {
-                child.position.set(centerX, 0, centerZ);
-            }
-        });
-    }
   }
+ 
   // 5. Toggle logic attached to our new injected button
   document.getElementById('btn-3d-toggle').onclick = function() {
     is3DMode = !is3DMode;
@@ -1310,9 +1717,10 @@ function build3DScene() {
         resizeCanvas();
     }
   };
-
+ 
 })();
-
+ 
 </script>
 </body>
 </html>
+ 
